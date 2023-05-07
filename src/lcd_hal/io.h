@@ -73,6 +73,12 @@
 #include "esp/esp8266_i2c.h"
 #include "esp/esp8266_spi.h"
 #endif
+#elif defined(__ESP32C3__) && !defined(ARDUINO)
+#include "esp32c3/io.h"
+#ifdef __cplusplus
+#include "esp32c3/esp32_i2c.h"
+#include "esp32c3/esp32_spi.h"
+#endif
 #elif defined(STM32F1) || defined(STM32F2) || defined(STM32F4)
 #include "stm32/io.h"
 #elif defined(__linux__) || defined(__APPLE__)

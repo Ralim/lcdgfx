@@ -42,7 +42,7 @@ public:
     /**
      * Creates instance of I2C interface for ESP32 controllers.
      *
-     * @param busId bus number to use, -1 defaults to I2C_NUM_0
+     * @param busId bus number to use, -1 defaults to I2C_NUM_1
      * @param sa address to use for oled device (7-bits, highest bit should be 0)
      * @param scl pin number to use as SCL pin, or -1 if default is used
      * @param sda pin number to use as SDA pin, or -1 if default is used

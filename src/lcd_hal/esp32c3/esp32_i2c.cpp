@@ -47,6 +47,8 @@ EspI2c::~EspI2c()
 
 void EspI2c::begin()
 {
+#ifndef NO_I2C_DRIVER_INIT
+    printf("I2C INIT\n");
     if ( m_busId < 0 )
         m_busId = I2C_NUM_0;
     if ( m_sda < 0 )
@@ -62,18 +64,22 @@ void EspI2c::begin()
     conf.master.clk_speed = m_frequency;
     i2c_param_config(static_cast<i2c_port_t>(m_busId), &conf);
     i2c_driver_install(static_cast<i2c_port_t>(m_busId), conf.mode, 0, 0, 0);
+#endif
 }
 
 void EspI2c::end()
 {
+#ifndef NO_I2C_DRIVER_INIT
     i2c_driver_delete(static_cast<i2c_port_t>(m_busId));
+
+#endif
 }
 
 void EspI2c::start()
 {
     m_cmd_handle = i2c_cmd_link_create();
-    i2c_master_start(m_cmd_handle);
-    i2c_master_write_byte(m_cmd_handle, (m_sa << 1) | I2C_MASTER_WRITE, 0x1);
+    ESP_ERROR_CHECK(i2c_master_start(m_cmd_handle));
+    ESP_ERROR_CHECK(i2c_master_write_byte(m_cmd_handle, (m_sa << 1) | I2C_MASTER_WRITE, 0x1));
 }
 
 #if !defined(portTICK_RATE_MS)
@@ -82,23 +88,19 @@ void EspI2c::start()
 
 void EspI2c::stop()
 {
-    i2c_master_stop(m_cmd_handle);
-    i2c_master_cmd_begin(static_cast<i2c_port_t>(m_busId), m_cmd_handle, 1000 / portTICK_RATE_MS);
+    ESP_ERROR_CHECK(i2c_master_stop(m_cmd_handle));
+    ESP_ERROR_CHECK(i2c_master_cmd_begin(static_cast<i2c_port_t>(m_busId), m_cmd_handle, 1000 / portTICK_RATE_MS));
     i2c_cmd_link_delete(m_cmd_handle);
 }
 
 void EspI2c::send(uint8_t data)
 {
-    i2c_master_write_byte(m_cmd_handle, data, 0x1);
+    ESP_ERROR_CHECK(i2c_master_write_byte(m_cmd_handle, data, 0x1));
 }
 
 void EspI2c::sendBuffer(const uint8_t *buffer, uint16_t size)
 {
-    while ( size-- )
-    {
-        send(*buffer);
-        buffer++;
-    }
+    ESP_ERROR_CHECK(i2c_master_write(m_cmd_handle, buffer, size, 0x01));
 }
 
 #endif
