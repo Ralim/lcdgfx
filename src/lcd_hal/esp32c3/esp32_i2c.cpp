@@ -47,6 +47,7 @@ EspI2c::~EspI2c()
 
 void EspI2c::begin()
 {
+    m_busId = I2C_NUM_0;
 #ifndef NO_I2C_DRIVER_INIT
     printf("I2C INIT\n");
     if ( m_busId < 0 )
@@ -88,6 +89,10 @@ void EspI2c::start()
 
 void EspI2c::stop()
 {
+    if ( m_cmd_handle == NULL )
+    {
+        EspI2c::start();
+    }
     ESP_ERROR_CHECK(i2c_master_stop(m_cmd_handle));
     ESP_ERROR_CHECK(i2c_master_cmd_begin(static_cast<i2c_port_t>(m_busId), m_cmd_handle, 1000 / portTICK_RATE_MS));
     i2c_cmd_link_delete(m_cmd_handle);
